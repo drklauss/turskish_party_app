@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:turkish_party_app/main.dart';
+import 'package:get_it/get_it.dart';
+import 'package:turkish_party_app/features/pass/block/block.dart';
+import 'package:turkish_party_app/features/pass/block/events.dart';
+import 'package:turkish_party_app/theme/theme.dart';
 
 class QuestionsPool extends StatefulWidget {
   const QuestionsPool({super.key});
@@ -9,7 +12,7 @@ class QuestionsPool extends StatefulWidget {
 }
 
 class _QuestionsPoolState extends State<QuestionsPool> {
-  bool? _q1t1;
+  bool _q1t1 = false;
   bool _q1t2 = false;
   bool _q1t3 = false;
 
@@ -20,14 +23,26 @@ class _QuestionsPoolState extends State<QuestionsPool> {
   bool _q3t1 = false;
   bool _q3t2 = false;
   bool _q3t3 = false;
+  PassBloc? _passBlock;
+
+  @override
+  void initState() {
+    _passBlock = GetIt.I<PassBloc>();
+
+    if (_passBlock == null) {
+      throw Exception("null bloc");
+    }
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: renderQuestions([
+    List<Widget> form = renderQuestions(
+      [
         [
           Switch.adaptive(
-            value: _q1t1 ?? false,
+            value: _q1t1,
             activeColor: Colors.red,
             onChanged: (val) => setState(() {
               _q1t1 = val;
@@ -94,8 +109,41 @@ class _QuestionsPoolState extends State<QuestionsPool> {
             }),
           )
         ],
-      ]),
+      ],
     );
+    form.add(Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        ElevatedButton.icon(
+            onPressed: () => {
+                  _checkAnswers([
+                    [_q1t1, _q1t2, _q1t3],
+                    [_q2t1, _q2t2, _q2t3],
+                    [_q3t1, _q3t2, _q3t3],
+                  ])
+                },
+            icon: const Icon(Icons.send_sharp),
+            label: const Text("Отправить"))
+      ],
+    ));
+    return Column(
+      children: form,
+    );
+  }
+
+  _checkAnswers(List<List<bool>> results) {
+    int score = 0;
+    for (int i = 0; i < results.length; i++) {
+      List<bool> result = results[i];
+      Question question = questionsList[i];
+      for (int k = 0; k < result.length; k++) {
+        if (result[k] == question.answers[k]) {
+          score++;
+        }
+      }
+    }
+
+    _passBlock!.add(PassWaitingEvent(score: score));
   }
 }
 
@@ -120,7 +168,7 @@ class QuestionActions extends Question {
 class Question {
   String question;
   List<String> variants = [];
-  List<int> answers = [];
+  List<bool> answers = [];
 
   Question({
     required this.question,
@@ -129,29 +177,29 @@ class Question {
   });
 }
 
-List<QuestionActions> getQuestions(List<List<Switch>> switchesList) {
-  List<Question> list = [
-    Question(
-      question: "Какие блюда являются турецкими?",
-      variants: ["Рахат-лукум", "Пельмени", "Пахлава"],
-      answers: [0, 2],
-    ),
-    Question(
-      question: "Какие известные города в Турции?",
-      variants: ["Стамбул", "Москва", "Сиде"],
-      answers: [0, 1],
-    ),
-    Question(
-      question: "Выберите известных людей Турции",
-      variants: ["Ахмед", "Эрдоган", "Мамай"],
-      answers: [1],
-    ),
-  ];
+List<Question> questionsList = [
+  Question(
+    question: "Какие блюда являются турецкими?",
+    variants: ["Рахат-лукум", "Пельмени", "Пахлава"],
+    answers: [true, false, true],
+  ),
+  Question(
+    question: "Какие известные города в Турции?",
+    variants: ["Стамбул", "Москва", "Сиде"],
+    answers: [true, false, true],
+  ),
+  Question(
+    question: "Выберите известных людей Турции",
+    variants: ["Ахмед", "Эрдоган", "Мамай"],
+    answers: [false, true, false],
+  ),
+];
 
+List<QuestionActions> getQuestionActions(List<List<Switch>> switchesList) {
   List<QuestionActions> result = [];
 
   for (var i = 0; i < switchesList.length; i++) {
-    Question q = list[i];
+    Question q = questionsList[i];
     QuestionActions qa = QuestionActions.create(q, switchesList[i]);
     result.add(qa);
   }
@@ -161,7 +209,7 @@ List<QuestionActions> getQuestions(List<List<Switch>> switchesList) {
 
 List<Widget> renderQuestions(List<List<Switch>> switchesList) {
   List<Widget> list = [];
-  List<QuestionActions> questions = getQuestions(switchesList);
+  List<QuestionActions> questions = getQuestionActions(switchesList);
   if (questions.isEmpty) {
     return [const Text("no questions")];
   }
@@ -183,10 +231,15 @@ List<Widget> renderQuestions(List<List<Switch>> switchesList) {
       );
     }
 
-    list.add(Card(
+    list.add(
+      Card(
+        key: GlobalKey(),
         child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(children: children))));
+          padding: const EdgeInsets.all(16),
+          child: Column(children: children),
+        ),
+      ),
+    );
     children = [];
   }
 
