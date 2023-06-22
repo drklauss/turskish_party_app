@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:turkish_party_app/theme/theme.dart';
 
 class InfoScreen extends StatelessWidget {
   const InfoScreen({super.key});
@@ -6,16 +7,15 @@ class InfoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TextTheme theme = Theme.of(context).textTheme;
-
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Center(
+            const Center(
               child: Text(
                 "Поздравляем, вы приглашены!",
-                style: theme.headlineLarge,
+                style: headlineLarge,
               ),
             ),
             const SizedBox(height: 8),
@@ -34,7 +34,7 @@ class InfoScreen extends StatelessWidget {
                 child: Image.asset("assets/images/party.jpg"),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
             Center(
               child: Text(
                 "На вечеринке вас ожидает:",
@@ -46,7 +46,7 @@ class InfoScreen extends StatelessWidget {
               shadowColor: Colors.grey,
               child: ListTile(
                 leading: const Icon(Icons.group),
-                title: Text('Отличная компания', style: theme.titleMedium),
+                title: const Text('Отличная компания', style: titleMedium),
                 subtitle: Text(
                   'Forbs даже стыдно писать о них',
                   style: theme.bodySmall,

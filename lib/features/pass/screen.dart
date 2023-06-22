@@ -46,32 +46,59 @@ class _PassScreenState extends State<PassScreen> {
 
         if (state is PassQuestionsState) {
           return const SingleChildScrollView(
-            child: Padding(padding: EdgeInsets.all(16), child: QuestionsPool()),
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  Center(
+                    child: Text(
+                      "Вопросы для получения пропуска",
+                      style: headlineLarge,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Center(
+                    child: Text(
+                      "Отвечай без помощи - так интереснее",
+                      style: bodySmall,
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  QuestionsPool()
+                ],
+              ),
+            ),
           );
         }
 
         if (state is PassWaitingState) {
           return AlertDialog(
               title: const LinearProgressIndicator(),
-              content: Container(
-                constraints: const BoxConstraints(minHeight: 60, maxWidth: 200),
-                child: AnimatedTextKit(
-                  animatedTexts: [
-                    TypewriterAnimatedText('Переживаешь?...',
-                        textStyle: const TextStyle(
-                          fontSize: 18.0,
-                        ),
-                        speed: const Duration(milliseconds: 75)),
-                    TypewriterAnimatedText(
-                        'Думаешь, у тебя будет QR-код без штрафа?...',
-                        textStyle: const TextStyle(
-                          fontSize: 18.0,
-                        ),
-                        speed: const Duration(milliseconds: 75)),
-                  ],
-                  totalRepeatCount: 1,
-                  onFinished: () => _passBlock!.add(PassDoneEvent()),
-                ),
+              content: AnimatedTextKit(
+                animatedTexts: [
+                  TypewriterAnimatedText(
+                    'Переживаешь?...',
+                    textStyle: titleMedium,
+                    speed: const Duration(milliseconds: 100),
+                  ),
+                  TypewriterAnimatedText(
+                    'Думаешь, все верно?...',
+                    textStyle: titleMedium,
+                    speed: const Duration(milliseconds: 100),
+                  ),
+                  TypewriterAnimatedText(
+                    'Ну, не знаю, не знаю...',
+                    textStyle: titleMedium,
+                    speed: const Duration(milliseconds: 100),
+                  ),
+                  TypewriterAnimatedText(
+                    'Исключительно за попытку...',
+                    textStyle: titleMedium,
+                    speed: const Duration(milliseconds: 100),
+                  ),
+                ],
+                totalRepeatCount: 1,
+                onFinished: () => _passBlock!.add(PassDoneEvent()),
               ));
         }
 
@@ -113,10 +140,11 @@ class QrCode extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(4.0),
                 child: QrImageView(
+                  padding: const EdgeInsets.all(16),
                   data: hash,
                   version: QrVersions.auto,
                   size: 320,
-                  gapless: true,
+                  gapless: false,
                 ),
               ),
             ),
