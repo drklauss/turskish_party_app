@@ -17,6 +17,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   crypto: ^3.0.3
   hive_flutter: ^1.1.0
+  flutter_svg: ^2.0.7
 
 dev_dependencies:
   flutter_test:
@@ -50,6 +51,9 @@ flutter:
   assets:
     - assets/images/turkish_flag.png
     - assets/images/party.jpg
+    - assets/images/party2.jpg
+    - assets/icons/hookah.png
+    - assets/icons/styler.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

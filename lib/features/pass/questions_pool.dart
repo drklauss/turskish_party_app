@@ -6,7 +6,10 @@ import 'package:turkish_party_app/features/pass/block/block.dart';
 import 'package:turkish_party_app/features/pass/block/events.dart';
 import 'package:turkish_party_app/theme/theme.dart';
 
+import 'models/questions.dart';
+
 class QuestionsPool extends StatefulWidget {
+  String get text => '';
   const QuestionsPool({super.key});
 
   @override
@@ -14,6 +17,11 @@ class QuestionsPool extends StatefulWidget {
 }
 
 class _QuestionsPoolState extends State<QuestionsPool> {
+  _QuestionsPoolState() : super();
+  PassBloc? _passBlock;
+  List<Question> randomQuestions = [];
+  List<int> questionsNum = [];
+
   bool _q1t1 = false;
   bool _q1t2 = false;
   bool _q1t3 = false;
@@ -25,9 +33,6 @@ class _QuestionsPoolState extends State<QuestionsPool> {
   bool _q3t1 = false;
   bool _q3t2 = false;
   bool _q3t3 = false;
-  PassBloc? _passBlock;
-  List<Question> randomQuestions = [];
-  List<int> questionsNum = [];
 
   @override
   void initState() {
@@ -135,6 +140,7 @@ class _QuestionsPoolState extends State<QuestionsPool> {
     );
   }
 
+  // Renders questions page of List<Widget>
   List<Widget> _render(List<List<Switch>> switchesList) {
     _generateRandomQuestions();
     List<Widget> list = [];
@@ -184,6 +190,7 @@ class _QuestionsPoolState extends State<QuestionsPool> {
     return list;
   }
 
+  // Generates random questions and save its indexes for answer checking
   _generateRandomQuestions() {
     if (randomQuestions.isNotEmpty) {
       return;
@@ -203,72 +210,26 @@ class _QuestionsPoolState extends State<QuestionsPool> {
     }
   }
 
-  // Проверка ответов осуществляется на основании данных о номере вопроса и
-  // принадлежащих ему переключателях
+  // Checks whether answers were correct or not. Operates on questions list
+  // and its stored indexes
   _checkAnswers(List<List<bool>> results) {
-    int score = 0;
+    int goal = 0;
+    int correct = 0;
     for (int i = 0; i < results.length; i++) {
       List<bool> result = results[i];
       int qI = questionsNum[i];
       Question question = questionsList[qI];
       for (int k = 0; k < result.length; k++) {
+        if (question.answers[k]) {
+          correct++;
+        }
         if (result[k] && result[k] == question.answers[k]) {
-          score++;
+          goal++;
         }
       }
     }
+    int accuracy = ((goal / correct) * 100).round();
 
-    _passBlock!.add(PassWaitingEvent(score: score));
+    _passBlock!.add(PassHandlingEvent(accuracy: accuracy, qNums: questionsNum));
   }
 }
-
-class Question {
-  String question;
-  List<String> variants = [];
-  List<bool> answers = [];
-  List<Switch> switches = [];
-
-  Question({
-    required this.question,
-    required this.variants,
-    required this.answers,
-  });
-
-  factory Question.expandSwicthes(Question question, List<Switch> switches) {
-    if (question.variants.length != switches.length) {
-      throw Exception("variants.length != switches.length");
-    }
-
-    question.switches = switches;
-
-    return question;
-  }
-}
-
-List<Question> questionsList = [
-  Question(
-    question: "Какие блюда являются турецкими?",
-    variants: ["Рахат-лукум", "Пельмени", "Пахлава"],
-    answers: [true, false, true],
-  ),
-  Question(
-    question: "Известные города в Турции?",
-    variants: ["Стамбул", "Москва", "Сиде"],
-    answers: [true, false, true],
-  ),
-  Question(
-    question: "Известные люди Турции",
-    variants: ["Гамбиджан", "Эрдоган", "Бусуман"],
-    answers: [false, true, false],
-  ),
-  Question(
-    question: "Известные сооружения Турции",
-    variants: ["Топкапы", "Дабыгалы", "Деринкую"],
-    answers: [true, false, true],
-  ),
-  Question(
-    question: "Варианты приветствия на турецком",
-    variants: ["Belunde", "Merhaba", "Günaydın"],
-    answers: [false, true, true],
-  ),
-];

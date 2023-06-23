@@ -2,11 +2,11 @@ class PassEvent {}
 
 class PassLoadEvent extends PassEvent {}
 
-class PassWaitingEvent extends PassEvent {
-  int score;
-  // List<int> questionNums;
+class PassHandlingEvent extends PassEvent {
+  int accuracy;
+  List<int> qNums;
 
-  PassWaitingEvent({required this.score});
+  PassHandlingEvent({required this.accuracy, required this.qNums});
 }
 
 class PassDoneEvent extends PassEvent {}

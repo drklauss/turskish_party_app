@@ -37,34 +37,32 @@ class _PassScreenState extends State<PassScreen> {
 
   @override
   Widget build(BuildContext context) {
+    TextTheme theme = Theme.of(context).textTheme;
     return BlocBuilder<PassBloc, PassState>(
       bloc: _passBlock,
       builder: (context, state) {
-        if (state is PassDoneState) {
-          return QrCode(qrCode: state.score.toString());
-        }
-
         if (state is PassQuestionsState) {
-          return const SingleChildScrollView(
+          // state.qNums
+          return SingleChildScrollView(
             child: Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
                   Center(
                     child: Text(
                       "Вопросы для получения пропуска",
-                      style: headlineLarge,
+                      style: theme.headlineLarge,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Center(
                     child: Text(
                       "Отвечай без помощи - так интереснее",
-                      style: bodySmall,
+                      style: theme.bodySmall,
                     ),
                   ),
-                  SizedBox(height: 16),
-                  QuestionsPool()
+                  const SizedBox(height: 16),
+                  const QuestionsPool(),
                 ],
               ),
             ),
@@ -73,33 +71,38 @@ class _PassScreenState extends State<PassScreen> {
 
         if (state is PassWaitingState) {
           return AlertDialog(
-              title: const LinearProgressIndicator(),
-              content: AnimatedTextKit(
-                animatedTexts: [
-                  TypewriterAnimatedText(
-                    'Переживаешь?...',
-                    textStyle: titleMedium,
-                    speed: const Duration(milliseconds: 100),
-                  ),
-                  TypewriterAnimatedText(
-                    'Думаешь, все верно?...',
-                    textStyle: titleMedium,
-                    speed: const Duration(milliseconds: 100),
-                  ),
-                  TypewriterAnimatedText(
-                    'Ну, не знаю, не знаю...',
-                    textStyle: titleMedium,
-                    speed: const Duration(milliseconds: 100),
-                  ),
-                  TypewriterAnimatedText(
-                    'Исключительно за попытку...',
-                    textStyle: titleMedium,
-                    speed: const Duration(milliseconds: 100),
-                  ),
-                ],
-                totalRepeatCount: 1,
-                onFinished: () => _passBlock!.add(PassDoneEvent()),
-              ));
+            title: const LinearProgressIndicator(),
+            content: AnimatedTextKit(
+              animatedTexts: [
+                TypewriterAnimatedText(
+                  'Переживаешь?...',
+                  textStyle: titleMedium,
+                  speed: const Duration(milliseconds: 100),
+                ),
+                TypewriterAnimatedText(
+                  'Думаешь, все верно?...',
+                  textStyle: titleMedium,
+                  speed: const Duration(milliseconds: 100),
+                ),
+                TypewriterAnimatedText(
+                  'Ну, не знаю, не знаю...',
+                  textStyle: titleMedium,
+                  speed: const Duration(milliseconds: 100),
+                ),
+                TypewriterAnimatedText(
+                  'Разве что за попытку...',
+                  textStyle: titleMedium,
+                  speed: const Duration(milliseconds: 100),
+                ),
+              ],
+              totalRepeatCount: 1,
+              onFinished: () => _passBlock!.add(PassDoneEvent()),
+            ),
+          );
+        }
+
+        if (state is PassDoneState) {
+          return QrCode(qrCode: state.score.toString());
         }
 
         return Container();
@@ -110,7 +113,7 @@ class _PassScreenState extends State<PassScreen> {
 
 class QrCode extends StatelessWidget {
   final String qrCode;
-  final String _prefix = "your_score_is:";
+  final String _prefix = "Result:";
 
   const QrCode({super.key, required this.qrCode});
 
