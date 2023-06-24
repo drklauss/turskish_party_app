@@ -64,10 +64,7 @@ class FormatScreen extends StatelessWidget {
                   "assets/icons/styler.svg",
                   width: 32,
                   height: 32,
-                  colorFilter: const ColorFilter.mode(
-                    Colors.grey,
-                    BlendMode.difference,
-                  ),
+                  color: Colors.grey,
                 ),
                 title: const Text('Шельвар, гемлек, ючетек, йелес'),
                 subtitle: Text(

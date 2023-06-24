@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class Question {
@@ -20,6 +22,49 @@ class Question {
     question.switches = switches;
 
     return question;
+  }
+
+  // Generates questions and save its indexes for answer checking
+  // if qNum is not sent - returns random questions
+  static Map<int, Question> get(List<int> qNum) {
+    if (qNum.isEmpty) {
+      Set<int> qn = {};
+      while (qn.length < 3) {
+        int rnd =
+            Random(DateTime.now().microsecond).nextInt(questionsList.length);
+        qn.add(rnd);
+      }
+      qNum = qn.toList();
+    }
+
+    Map<int, Question> randomQuestions = {};
+    for (int indx in qNum) {
+      randomQuestions[indx] = (questionsList[indx]);
+    }
+
+    return randomQuestions;
+  }
+
+  // Checks whether answers were correct or not. Operates on questions list
+  // and its stored indexes
+  static int checkAnswers(List<List<bool>> results, List<int> qNum) {
+    int goal = 0;
+    int correct = 0;
+    for (int i = 0; i < results.length; i++) {
+      List<bool> result = results[i];
+      int qI = qNum[i];
+      Question question = questionsList[qI];
+      for (int k = 0; k < result.length; k++) {
+        if (question.answers[k]) {
+          correct++;
+        }
+        if (result[k] && result[k] == question.answers[k]) {
+          goal++;
+        }
+      }
+    }
+
+    return ((goal / correct) * 100).round();
   }
 }
 

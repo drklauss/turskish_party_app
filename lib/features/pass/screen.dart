@@ -43,28 +43,26 @@ class _PassScreenState extends State<PassScreen> {
       builder: (context, state) {
         if (state is PassQuestionsState) {
           // state.qNums
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Center(
-                    child: Text(
-                      "Вопросы для получения пропуска",
-                      style: theme.headlineLarge,
-                    ),
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: ListView(
+              children: [
+                Center(
+                  child: Text(
+                    "Вопросы для получения пропуска",
+                    style: theme.headlineLarge,
                   ),
-                  const SizedBox(height: 8),
-                  Center(
-                    child: Text(
-                      "Отвечай без помощи - так интереснее",
-                      style: theme.bodySmall,
-                    ),
+                ),
+                const SizedBox(height: 8),
+                Center(
+                  child: Text(
+                    "Отвечай без помощи - так интереснее",
+                    style: theme.bodySmall,
                   ),
-                  const SizedBox(height: 16),
-                  const QuestionsPool(),
-                ],
-              ),
+                ),
+                const SizedBox(height: 16),
+                const QuestionsPool(),
+              ],
             ),
           );
         }
@@ -102,7 +100,7 @@ class _PassScreenState extends State<PassScreen> {
         }
 
         if (state is PassDoneState) {
-          return QrCode(qrCode: state.score.toString());
+          return QrCode(accuracy: state.accuracy);
         }
 
         return Container();
@@ -112,15 +110,17 @@ class _PassScreenState extends State<PassScreen> {
 }
 
 class QrCode extends StatelessWidget {
-  final String qrCode;
-  final String _prefix = "Result:";
+  const QrCode({super.key, required this.accuracy});
 
-  const QrCode({super.key, required this.qrCode});
+  final int accuracy;
 
   @override
   Widget build(BuildContext context) {
     TextTheme theme = Theme.of(context).textTheme;
-    String hash = md5.convert(utf8.encode(_prefix + qrCode)).toString();
+
+    String text = accuracy > 80 ? "Passed" : "Failed";
+    String hash =
+        base64Encode(utf8.encode('Your result is: $accuracy%. $text'));
     debugPrint(hash);
 
     return Padding(

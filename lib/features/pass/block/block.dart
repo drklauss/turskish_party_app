@@ -22,21 +22,13 @@ class PassBloc extends Bloc<PassEvent, PassState> {
           return;
         }
 
-        List<int> qNums;
-        try {
-          qNums = _scoreRepository.getQNums();
-        } catch (_) {
-          qNums = [];
-        }
-
-        emit(PassQuestionsState(qNums: qNums));
+        emit(PassQuestionsState());
 
         return;
       }
 
       if (event is PassHandlingEvent) {
         _scoreRepository.setAccuracy(event.accuracy);
-        _scoreRepository.setQNums(event.qNums);
         emit(PassWaitingState());
       }
 

@@ -9,8 +9,10 @@ import 'theme/theme.dart';
 void main() async {
   await Hive.initFlutter();
   var box = await Hive.openBox('appBox');
-  box.put('score', 0);
-  GetIt.I.registerLazySingleton<PassBloc>(() => PassBloc(HiveRepository(box)));
+  HiveRepository hr = HiveRepository(box);
+
+  GetIt.I.registerLazySingleton<HiveRepository>(() => (hr));
+  GetIt.I.registerLazySingleton<PassBloc>(() => PassBloc(hr));
 
   runApp(const TurkishPartyApp());
 }
